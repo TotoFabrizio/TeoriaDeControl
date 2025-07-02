@@ -16,8 +16,8 @@
         <div class="card-body">
             <h5 class="card-title">Modificadores</h5>
             <form>
-                <label for="button" class="form-label">Tipo entrada</label>
-                <div class="input-group mb-3">
+                <label for="button" class="form-label d-none">Tipo entrada</label>
+                <div class="input-group mb-3 d-none">
                     <div class="input-group-text">
                         <input class="form-check-input mt-0" type="radio" name="radioTipoEntrada" value="0" aria-label="radio for following text input">
                         <label class="form-check-label ms-2 me-2">Impulso</label>
@@ -92,7 +92,7 @@
 
 
             // Set initial value
-            ampEntrada.value = 10;
+            ampEntrada.value = 63;
             outputEnt.textContent = ampEntrada.value;
 
             ampEntrada.addEventListener('input', function() {
@@ -128,7 +128,7 @@
             });
 
             ampPer.value = 10;
-            outputRetro.textContent = ampPer.value;
+            outPer.textContent = ampPer.value;
 
             ampPer.addEventListener('input', function() {
                 outPer.textContent = this.value;
@@ -138,48 +138,56 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
         <script>
-            // Example data for the chart
-            const labels = ['T1', 'T2', 'T3', 'T4', 'T5'];
+            let cantValores = 25;
+            const labels = Array.from({length: cantValores}, (_, i) => `T${i+1}`);
 
             let datasetEntrada = {
                     label: 'Entrada',
-                    data: [0,0,0,0,0],
+                    data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 };
             let datasetPerturbacion = {
                     label: 'Perturbación',
-                    data: [0,0,0,0,0],
+                    data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(248, 37, 37, 0.2)',
                     borderColor: 'rgba(248, 37, 37, 1)',
                     borderWidth: 1
                 };
-            let datasetSalida = {
-                    label: 'Salida',
-                    data: [0,0,0,0,0],
+            let datasetSalidaCon = {
+                    label: 'SalidaControlador',
+                    data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(69, 248, 84, 0.2)',
                     borderColor: 'rgba(69, 248, 84, 1)',
                     borderWidth: 1
                 };
             let datasetRetro = {
                     label: 'Retroalimentación',
-                    data: [0,0,0,0,0],
+                    data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(245, 40, 145, 0.2)',
                     borderColor: 'rgba(245, 40, 145, 0.8)',
                     borderWidth: 1
                 };
             let datasetError = {
                     label: 'Error',
-                    data: [0,0,0,0,0],
+                    data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(235, 192, 52, 0.2)',
                     borderColor: 'rgba(235, 192, 52, 1)',
+                    borderWidth: 1
+                };
+            let datasetSalida = {
+                    label: 'Salida',
+                    data: Array(cantValores).fill(0),
+                    backgroundColor: 'rgba(110, 17, 250, 0.2)',
+                    borderColor: 'rgba(110, 17, 250, 1)',
+                    borderDash: [5, 5],
                     borderWidth: 1
                 };
 
             const data = {
                 labels: labels,
-                datasets: [datasetEntrada, datasetRetro, datasetError, datasetSalida, datasetPerturbacion]
+                datasets: [datasetEntrada, datasetRetro, datasetError, datasetSalidaCon, datasetSalida, datasetPerturbacion]
             };
 
             // Configuration options
@@ -206,45 +214,43 @@
 
             let identificadorIntervaloDeTiempo;
 
+            let perturbacion = 0;
+
             function repetirCadaSegundo() {
                 identificadorIntervaloDeTiempo = setInterval(actualizarDatasets, 1000);
             }
             repetirCadaSegundo();
 
+            let kp = fProporcional.value / 100;
+            let ki = fIntegral.value / 100;
+            let kd = fDerivativo.value / 100;
+
             function actualizarDatasets() {
-                if(datasetEntrada.data.length ==5){
-                    datasetEntrada.data.shift();
-                }
+                datasetEntrada.data.shift();
                 datasetEntrada.data.push(parseFloat(ampEntrada.value));
                 
-
-                 if(datasetError.data.length ==5){
-                    datasetError.data.shift();
-                }
+                datasetError.data.shift();
                 datasetError.data.push(ampEntrada.value - datasetRetro.data[datasetRetro.data.length - 1]);
 
                 acumuladoParaIntegral += datasetError.data[datasetError.data.length - 1];
                 ciclos++;
 
-                if(datasetSalida.data.length ==5){
-                    datasetSalida.data.shift();
-                }
-                datasetSalida.data.push(
-                    datasetEntrada.data[datasetEntrada.data.length - 1] * fProporcional.value / 100 +
-                    (acumuladoParaIntegral/ciclos) * fIntegral.value / 100 +
-                    (datasetEntrada.data[datasetEntrada.data.length - 1] - datasetSalida.data[datasetSalida.data.length - 2]) * fDerivativo.value / 100 +
+                datasetSalidaCon.data.shift();
+                datasetSalidaCon.data.push(
+                    datasetError.data[datasetError.data.length - 1] * kp +
+                    (acumuladoParaIntegral/ciclos) * ki +
+                    (datasetError.data[datasetError.data.length - 1] - datasetError.data[datasetError.data.length - 2]) * kd +
                     datasetPerturbacion.data[datasetPerturbacion.data.length - 1]
                 );
 
-                if(datasetRetro.data.length ==5){
-                    datasetRetro.data.shift();
-                }
-                datasetRetro.data.push(datasetSalida.data[datasetSalida.data.length - 1]*fRetro.value/100);  
+                datasetRetro.data.shift();
+                datasetRetro.data.push(datasetSalidaCon.data[datasetSalidaCon.data.length - 1]*fRetro.value/100);
+
+                datasetSalida.data.shift();
+                datasetSalida.data.push(valorRpm(datasetSalidaCon.data[datasetSalidaCon.data.length - 1]));
                 
-                if(datasetPerturbacion.data.length ==5){
-                    datasetPerturbacion.data.shift();
-                }
-                datasetPerturbacion.data.push(0);
+                datasetPerturbacion.data.shift();
+                datasetPerturbacion.data.push(perturbacion);
 
                 myChart.data = data;
                 myChart.update();
@@ -257,7 +263,13 @@
                 }
                 return suma / array.length;
             }
-          
+            
+            function valorRpm(temp){
+                let valor = 6 + (54)/(100)*(temp-5);
+                let real = Math.max(6, Math.min(60, valor));
+                return real;
+            }
+
             const botonPerturbar = document.getElementById('perturbar');
 
             botonPerturbar.addEventListener('click', function(){
@@ -267,8 +279,17 @@
                     i++
                 }
                 let impPer = document.getElementById('ampPerturbacion');
-                datasetPerturbacion.data.shift();
-                datasetPerturbacion.data.push(parseFloat(impPer.value));
+                perturbacion = parseFloat(impPer.value);
+                if(i == 0){
+                    console.log("Perturbación tipo impulso");  
+                    datasetPerturbacion.data.shift();
+                    datasetPerturbacion.data.push(parseFloat(impPer.value));
+                    perturbacion = 0;
+                }else{
+                    console.log("Perturbación tipo escalon");  
+                    datasetPerturbacion.data.shift();
+                    datasetPerturbacion.data.push(parseFloat(impPer.value));
+                }
             })
         </script>
     </body>
