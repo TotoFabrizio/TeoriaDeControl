@@ -43,8 +43,8 @@
                     <div class="input-group-text">
                         <input class="form-check-input mt-0" type="radio" name="radioTipoPertur" value="0" aria-label="radio for following text input" checked>
                         <label class="form-check-label ms-2 me-2">Impulso</label>
-                        <input class="form-check-input mt-0" type="radio" name="radioTipoPertur" value="1" aria-label="radio for following text input">
-                        <label class="form-check-label ms-2 me-2">Escalon</label>
+                        <input class="form-check-input mt-0 d-none" type="radio" name="radioTipoPertur" value="1" aria-label="radio for following text input">
+                        <label class="form-check-label ms-2 d-none me-2">Escalon</label>
                     </div>
                 </div>
                 <div>
@@ -120,7 +120,7 @@
                 outputDer.textContent = this.value;
             });
 
-            fRetro.value = 10;
+            fRetro.value = 40;
             outputRetro.textContent = fRetro.value;
 
             fRetro.addEventListener('input', function() {
@@ -142,42 +142,42 @@
             const labels = Array.from({length: cantValores}, (_, i) => `T${i+1}`);
 
             let datasetEntrada = {
-                    label: 'Entrada',
+                    label: 'Entrda(θ_i)',
                     data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 };
             let datasetPerturbacion = {
-                    label: 'Perturbación',
+                    label: 'Perturbación(P)',
                     data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(248, 37, 37, 0.2)',
                     borderColor: 'rgba(248, 37, 37, 1)',
                     borderWidth: 1
                 };
             let datasetSalidaCon = {
-                    label: 'SalidaControlador',
+                    label: 'SalidaControlador(h)',
                     data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(69, 248, 84, 0.2)',
                     borderColor: 'rgba(69, 248, 84, 1)',
                     borderWidth: 1
                 };
             let datasetRetro = {
-                    label: 'Retroalimentación',
+                    label: 'Retroalimentación(f)',
                     data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(245, 40, 145, 0.2)',
                     borderColor: 'rgba(245, 40, 145, 0.8)',
                     borderWidth: 1
                 };
             let datasetError = {
-                    label: 'Error',
+                    label: 'Error(e)',
                     data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(235, 192, 52, 0.2)',
                     borderColor: 'rgba(235, 192, 52, 1)',
                     borderWidth: 1
                 };
             let datasetSalida = {
-                    label: 'Salida',
+                    label: 'Salida(θ_o)',
                     data: Array(cantValores).fill(0),
                     backgroundColor: 'rgba(110, 17, 250, 0.2)',
                     borderColor: 'rgba(110, 17, 250, 1)',
