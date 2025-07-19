@@ -221,11 +221,17 @@
             }
             repetirCadaSegundo();
 
-            let kp = fProporcional.value / 100;
-            let ki = fIntegral.value / 100;
-            let kd = fDerivativo.value / 100;
+            
+
+            
+
 
             function actualizarDatasets() {
+
+                let kp = fProporcional.value / 100;
+                let ki = fIntegral.value / 100;
+                let kd = fDerivativo.value / 100;
+
                 datasetEntrada.data.shift();
                 datasetEntrada.data.push(parseFloat(ampEntrada.value));
                 
